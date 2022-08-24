@@ -43,6 +43,9 @@ func CreateSupplier(supplier Supplier) (Supplier, int, error) {
 	supplier.CreatedAt = time.Now().UTC().Format(time.RFC3339)
 	supplier.UpdatedAt = supplier.CreatedAt
 	_, err := collection.InsertOne(ctx, supplier)
+	if err != nil {
+		return supplier, http.StatusInternalServerError, err
+	}
 	return supplier, http.StatusCreated, err
 }
 

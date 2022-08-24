@@ -45,6 +45,9 @@ func CreateOrder(order Order) (Order, int, error) {
 	order.CreatedAt = time.Now().UTC().Format(time.RFC3339)
 	order.UpdatedAt = order.CreatedAt
 	_, err := collection.InsertOne(ctx, order)
+	if err != nil {
+		return order, http.StatusInternalServerError, err
+	}
 	return order, http.StatusCreated, err
 }
 
