@@ -19,8 +19,9 @@ type Respone struct {
 func main() {
 	var wg sync.WaitGroup
 	grpcCustomerClient := make(chan pb.CustomerServiceClient)
+	grpcSupplierClient := make(chan pb.SupplierServiceClient)
 
-	wg.Add(2)
+	wg.Add(3)
 	// Start the grpc client to Customers gRPC server
 	go func() {
 		defer wg.Done()
@@ -31,6 +32,19 @@ func main() {
 				log.Fatalf("failed to dial: %s", err.Error())
 			}
 			grpcCustomerClient <- pb.NewCustomerServiceClient(cc)
+		}
+	}()
+
+	// Start the grpc client to Suppliers gRPC server
+	go func() {
+		defer wg.Done()
+		for {
+			log.Print("Dialing Suppliers gRPC server on port 4001")
+			cc, err := grpc.Dial("localhost:4003", grpc.WithTransportCredentials(insecure.NewCredentials()))
+			if err != nil {
+				log.Fatalf("failed to dial: %s", err.Error())
+			}
+			grpcSupplierClient <- pb.NewSupplierServiceClient(cc)
 		}
 	}()
 
@@ -45,7 +59,7 @@ func main() {
 			if err := c.BodyParser(&order); err != nil {
 				return c.Status(http.StatusBadRequest).JSON(Respone{Message: err.Error()})
 			}
-			order, status, err := data.CreateOrder(order, <-grpcCustomerClient)
+			order, status, err := data.CreateOrder(order, <-grpcCustomerClient, <-grpcSupplierClient)
 			if err != nil {
 				return c.Status(status).JSON(Respone{Message: err.Error()})
 			}

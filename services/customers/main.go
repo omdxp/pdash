@@ -34,7 +34,7 @@ func main() {
 		pb.RegisterCustomerServiceServer(s, &server{})
 		reflection.Register(s)
 
-		log.Print("Starting Customers gRPC server on port 4001")
+		log.Print("Starting Customer gRPC server on port 4001")
 		if err := s.Serve(lis); err != nil {
 			log.Fatalf("failed to serve: %s", err.Error())
 		}

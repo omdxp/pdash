@@ -43,13 +43,29 @@ type Order struct {
 type Orders []Order
 
 // CreateOrder creates a new Order document
-func CreateOrder(order Order, grpcCustomerClient pb.CustomerServiceClient) (Order, int, error) {
+func CreateOrder(order Order, grpcCustomerClient pb.CustomerServiceClient, grpcSupplierClient pb.SupplierServiceClient) (Order, int, error) {
 	order.ID = primitive.NewObjectID()
 	order.CreatedAt = time.Now().UTC().Format(time.RFC3339)
 	order.UpdatedAt = order.CreatedAt
-	// check if customer exist
+	// check if customer exists
 	_, err := grpcCustomerClient.GetCustomer(ctx, &pb.Customer{
 		Id: order.CustomerID.Hex(),
+	})
+	if err != nil {
+		s, ok := status.FromError(err)
+		if ok {
+			if s.Code() == codes.NotFound {
+				return order, http.StatusNotFound, err
+			} else {
+				return order, http.StatusInternalServerError, err
+			}
+		} else {
+			return order, http.StatusInternalServerError, err
+		}
+	}
+	// check if supplier exists
+	_, err = grpcSupplierClient.GetSupplier(ctx, &pb.Supplier{
+		Id: order.SupplierID.Hex(),
 	})
 	if err != nil {
 		s, ok := status.FromError(err)
