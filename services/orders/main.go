@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"strings"
 	"sync"
 
 	"github.com/Omar-Belghaouti/pdash/pb"
@@ -68,6 +69,25 @@ func main() {
 
 		// Get all Orders
 		app.Get("/orders", func(c *fiber.Ctx) error {
+			supplierID := c.Query("supplier_id")
+			customerID := c.Query("customer_id")
+			if strings.TrimSpace(supplierID) != "" && strings.TrimSpace(customerID) != "" {
+				return c.Status(http.StatusBadRequest).JSON(Respone{Message: "supplier_id and customer_id are mutually exclusive"})
+			}
+			if strings.TrimSpace(supplierID) != "" {
+				orders, status, err := data.GetOrdersBySupplierID(supplierID, <-grpcSupplierClient)
+				if err != nil {
+					return c.Status(status).JSON(Respone{Message: err.Error()})
+				}
+				return c.Status(status).JSON(orders)
+			}
+			if strings.TrimSpace(customerID) != "" {
+				orders, status, err := data.GetOrdersByCustomerID(customerID, <-grpcCustomerClient)
+				if err != nil {
+					return c.Status(status).JSON(Respone{Message: err.Error()})
+				}
+				return c.Status(status).JSON(orders)
+			}
 			orders, status, err := data.GetOrders()
 			if err != nil {
 				return c.Status(status).JSON(Respone{Message: err.Error()})

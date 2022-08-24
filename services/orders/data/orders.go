@@ -102,6 +102,70 @@ func GetOrders() (Orders, int, error) {
 	return orders, http.StatusOK, nil
 }
 
+// GetOrdersByCustomerID returns all Orders by Customer ID
+func GetOrdersByCustomerID(id string, grpcCustomerClient pb.CustomerServiceClient) (Orders, int, error) {
+	// check if customer exists
+	_, err := grpcCustomerClient.GetCustomer(ctx, &pb.Customer{
+		Id: id,
+	})
+	if err != nil {
+		s, ok := status.FromError(err)
+		if ok {
+			if s.Code() == codes.NotFound {
+				return Orders{}, http.StatusNotFound, err
+			} else {
+				return Orders{}, http.StatusInternalServerError, err
+			}
+		} else {
+			return Orders{}, http.StatusInternalServerError, err
+		}
+	}
+	var orders Orders
+	cursor, err := collection.Find(ctx, bson.M{"customer_id": id})
+	if err != nil {
+		return orders, http.StatusInternalServerError, err
+	}
+	if err := cursor.All(ctx, &orders); err != nil {
+		return orders, http.StatusInternalServerError, err
+	}
+	if orders == nil {
+		return Orders{}, http.StatusNotFound, nil
+	}
+	return orders, http.StatusOK, nil
+}
+
+// GetOrdersBySupplierID returns all Orders by Supplier ID
+func GetOrdersBySupplierID(id string, grpcSupplierClient pb.SupplierServiceClient) (Orders, int, error) {
+	// check if supplier exists
+	_, err := grpcSupplierClient.GetSupplier(ctx, &pb.Supplier{
+		Id: id,
+	})
+	if err != nil {
+		s, ok := status.FromError(err)
+		if ok {
+			if s.Code() == codes.NotFound {
+				return Orders{}, http.StatusNotFound, err
+			} else {
+				return Orders{}, http.StatusInternalServerError, err
+			}
+		} else {
+			return Orders{}, http.StatusInternalServerError, err
+		}
+	}
+	var orders Orders
+	cursor, err := collection.Find(ctx, bson.M{"supplier_id": id})
+	if err != nil {
+		return orders, http.StatusInternalServerError, err
+	}
+	if err := cursor.All(ctx, &orders); err != nil {
+		return orders, http.StatusInternalServerError, err
+	}
+	if orders == nil {
+		return Orders{}, http.StatusNotFound, nil
+	}
+	return orders, http.StatusOK, nil
+}
+
 // GetOrder returns a Order by ID
 func GetOrder(id string) (Order, int, error) {
 	var order Order
