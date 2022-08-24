@@ -2,11 +2,13 @@ package data
 
 import (
 	"context"
+	"encoding/json"
 	"log"
 	"net/http"
 	"time"
 
 	"github.com/Omar-Belghaouti/pdash/pb"
+	"github.com/go-redis/redis/v9"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -18,6 +20,7 @@ import (
 var (
 	ctx        context.Context
 	collection *mongo.Collection
+	rdb        *redis.Client
 )
 
 func init() {
@@ -27,6 +30,14 @@ func init() {
 		log.Fatalf("Error connecting to MongoDB: %s", err.Error())
 	}
 	collection = client.Database("db").Collection("orders")
+	rdb = redis.NewClient(&redis.Options{
+		Addr: "localhost:6379",
+	})
+}
+
+// MarshalBinary is a marshalling function for Order
+func (order Order) MarshalBinary() ([]byte, error) {
+	return json.Marshal(order)
 }
 
 // Order struct is a representation of a Order document
@@ -169,13 +180,31 @@ func GetOrdersBySupplierID(id string, grpcSupplierClient pb.SupplierServiceClien
 // GetOrder returns a Order by ID
 func GetOrder(id string) (Order, int, error) {
 	var order Order
-	objectID, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return order, http.StatusBadRequest, err
+	// get order from cache
+	val, err := rdb.Get(ctx, id).Result()
+	if err == redis.Nil {
+		// order not in cache
+		objectID, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			return order, http.StatusBadRequest, err
+		}
+		err = collection.FindOne(ctx, bson.M{"_id": objectID}).Decode(&order)
+		if err != nil {
+			return order, http.StatusNotFound, err
+		}
+		// set order in cache for 5 minutes
+		err = rdb.Set(ctx, id, order, time.Minute*5).Err()
+		if err != nil {
+			return order, http.StatusInternalServerError, err
+		}
+		return order, http.StatusOK, nil
+	} else if err != nil {
+		return order, http.StatusInternalServerError, err
 	}
-	err = collection.FindOne(ctx, bson.M{"_id": objectID}).Decode(&order)
+	// order in cache
+	err = json.Unmarshal([]byte(val), &order)
 	if err != nil {
-		return order, http.StatusNotFound, err
+		return order, http.StatusInternalServerError, err
 	}
 	return order, http.StatusOK, nil
 }
@@ -196,6 +225,11 @@ func UpdateOrder(id string, order Order) (Order, int, error) {
 	if err != nil {
 		return order, http.StatusInternalServerError, err
 	}
+	// set order in cache for 5 minutes
+	err = rdb.Set(ctx, id, order, time.Minute*5).Err()
+	if err != nil {
+		return order, http.StatusInternalServerError, err
+	}
 	return order, http.StatusOK, nil
 }
 
@@ -211,6 +245,11 @@ func DeleteOrder(id string) (int, error) {
 		return http.StatusBadRequest, err
 	}
 	_, err = collection.DeleteOne(ctx, bson.M{"_id": objectID})
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+	// remove order from cache
+	err = rdb.Del(ctx, id).Err()
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
