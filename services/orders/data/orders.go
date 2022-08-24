@@ -6,10 +6,13 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/Omar-Belghaouti/pdash/pb"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 var (
@@ -40,11 +43,27 @@ type Order struct {
 type Orders []Order
 
 // CreateOrder creates a new Order document
-func CreateOrder(order Order) (Order, int, error) {
+func CreateOrder(order Order, grpcCustomerClient pb.CustomerServiceClient) (Order, int, error) {
 	order.ID = primitive.NewObjectID()
 	order.CreatedAt = time.Now().UTC().Format(time.RFC3339)
 	order.UpdatedAt = order.CreatedAt
-	_, err := collection.InsertOne(ctx, order)
+	// check if customer exist
+	_, err := grpcCustomerClient.GetCustomer(ctx, &pb.Customer{
+		Id: order.CustomerID.Hex(),
+	})
+	if err != nil {
+		s, ok := status.FromError(err)
+		if ok {
+			if s.Code() == codes.NotFound {
+				return order, http.StatusNotFound, err
+			} else {
+				return order, http.StatusInternalServerError, err
+			}
+		} else {
+			return order, http.StatusInternalServerError, err
+		}
+	}
+	_, err = collection.InsertOne(ctx, order)
 	if err != nil {
 		return order, http.StatusInternalServerError, err
 	}
