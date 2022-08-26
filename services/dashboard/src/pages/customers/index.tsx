@@ -6,12 +6,14 @@ import {
 } from "@tanstack/solid-table";
 import { Component, For, createSignal } from "solid-js";
 import {
+  addCustomer,
   customers,
   deleteCustomer,
   refetchCustomers,
   updateCustomer,
 } from "../../store";
 
+import AddCustomerModal from "../../components/add-customer-modal";
 import { Customer } from "../../interfaces";
 import { Link } from "@solidjs/router";
 import ModifyCustomerModal from "../../components/modify-customer-modal";
@@ -84,12 +86,29 @@ const Customers: Component = ({}) => {
     columns: defaultColumns,
     getCoreRowModel: getCoreRowModel(),
   });
+  const [addCustomerModalShown, setAddCustomerModalShown] = createSignal(false);
   return (
     <div class="flex flex-col">
       {customers.loading ? (
         <div>Loading...</div>
       ) : (
         <div>
+          <button
+            class="bg-blue-500 m-2 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            onClick={() => setAddCustomerModalShown(true)}
+          >
+            Add new customer
+          </button>
+          {addCustomerModalShown() && (
+            <AddCustomerModal
+              submit={async (draftCustomer) => {
+                await addCustomer(draftCustomer);
+                await refetchCustomers();
+                setAddCustomerModalShown(false);
+              }}
+              cancel={() => setAddCustomerModalShown(false)}
+            />
+          )}
           {selectedCustomer() && (
             <ModifyCustomerModal
               customer={selectedCustomer()}

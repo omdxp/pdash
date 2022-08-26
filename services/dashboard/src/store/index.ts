@@ -146,3 +146,16 @@ export async function deleteSupplier(id: string) {
     return await res.json();
   }
 }
+
+export async function addCustomer(customer: Partial<Customer>) {
+  const res = await fetch(CUSTOMERS_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(customer),
+  });
+  if (res.status == 200) {
+    return await res.json();
+  }
+}
