@@ -2,6 +2,7 @@ import { CUSTOMERS_URL, ORDERS_URL, SUPPLIERS_URL } from "../config";
 import {
   Customer,
   Customers,
+  Order,
   Orders,
   Supplier,
   Suppliers,
@@ -33,9 +34,10 @@ async function fetchSuppliers(): Promise<Suppliers> {
   return [];
 }
 
-export const [customers, { mutate, refetch }] = createResource(fetchCustomers);
-export const [orders, { mutate: mutateOrders }] = createResource(fetchOrders);
-export const [suppliers, { mutate: mutateSuppliers }] =
+export const [customers, { refetch: refetchCustomers }] =
+  createResource(fetchCustomers);
+export const [orders, { refetch: refetchOrders }] = createResource(fetchOrders);
+export const [suppliers, { refetch: refetchSuppliers }] =
   createResource(fetchSuppliers);
 
 export async function fetchSupplier(id: string): Promise<Supplier> {
@@ -68,4 +70,29 @@ export async function fetchCustomerOrders(id: string): Promise<Orders> {
     return await res.json();
   }
   return [];
+}
+
+export async function updateOrder(order: Order) {
+  const res = await fetch(ORDERS_URL + "/" + order.id, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(order),
+  });
+  if (res.status == 200) {
+    return await res.json();
+  }
+}
+
+export async function deleteOrder(id: string) {
+  const res = await fetch(ORDERS_URL + "/" + id, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  if (res.status == 200) {
+    return await res.json();
+  }
 }

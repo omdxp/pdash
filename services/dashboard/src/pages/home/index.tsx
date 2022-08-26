@@ -4,17 +4,31 @@ import {
   flexRender,
   getCoreRowModel,
 } from "@tanstack/solid-table";
-import { Component, For } from "solid-js";
+import { Component, For, createSignal } from "solid-js";
+import { deleteOrder, orders, refetchOrders, updateOrder } from "../../store";
 
+import DeleteModal from "../../components/delete-modal";
 import { Link } from "@solidjs/router";
+import ModifyOrderModal from "../../components/modify-order-modal";
 import { Order } from "../../interfaces";
-import { orders } from "../../store";
+
+const [selectedOrder, setSelectedOrder] = createSignal<Order>(null);
 
 const defaultColumns: ColumnDef<Order>[] = [
   {
     accessorKey: "id",
     header: "ID",
-    cell: (info) => info.getValue(),
+    cell: (info) => (
+      <button
+        onClick={() =>
+          setSelectedOrder(
+            orders().filter((el) => el.id === (info.getValue() as string))[0]
+          )
+        }
+      >
+        {info.getValue() as string}
+      </button>
+    ),
     footer: (info) => info.column.id,
   },
   {
@@ -81,6 +95,22 @@ const Home: Component = ({}) => {
         <div>Loading...</div>
       ) : (
         <div>
+          {selectedOrder() && (
+            <ModifyOrderModal
+              order={selectedOrder()}
+              submit={async (draftOrder) => {
+                await updateOrder(draftOrder);
+                await refetchOrders();
+                setSelectedOrder(null);
+              }}
+              cancel={() => setSelectedOrder(null)}
+              deleteOrder={async () => {
+                await deleteOrder(selectedOrder().id);
+                await refetchOrders();
+                setSelectedOrder(null);
+              }}
+            />
+          )}
           <table>
             <thead>
               <For each={table.getHeaderGroups()}>
