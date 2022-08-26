@@ -9,6 +9,7 @@ import (
 	"github.com/Omar-Belghaouti/pdash/pb"
 	"github.com/Omar-Belghaouti/pdash/services/suppliers/data"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
@@ -44,6 +45,9 @@ func main() {
 	go func() {
 		defer wg.Done()
 		app := fiber.New()
+
+		// CORS
+		app.Use(cors.New())
 
 		// Create a new Supplier
 		app.Post("/suppliers", func(c *fiber.Ctx) error {
