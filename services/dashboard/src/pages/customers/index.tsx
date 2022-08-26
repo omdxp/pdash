@@ -7,13 +7,18 @@ import {
 import { Component, For } from "solid-js";
 
 import { Customer } from "../../interfaces";
+import { Link } from "@solidjs/router";
 import { customers } from "../../store";
 
 const defaultColumns: ColumnDef<Customer>[] = [
   {
     accessorKey: "id",
     header: "ID",
-    cell: (info) => info.getValue(),
+    cell: (info) => (
+      <Link href={`/customers/${info.getValue()}`}>
+        <a class="hover:text-blue-600">{info.getValue() as string}</a>
+      </Link>
+    ),
     footer: (info) => info.column.id,
   },
   {

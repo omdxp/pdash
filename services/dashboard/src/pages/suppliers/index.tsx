@@ -6,6 +6,7 @@ import {
 } from "@tanstack/solid-table";
 import { Component, For } from "solid-js";
 
+import { Link } from "@solidjs/router";
 import { Supplier } from "../../interfaces";
 import { suppliers } from "../../store";
 
@@ -13,7 +14,11 @@ const defaultColumns: ColumnDef<Supplier>[] = [
   {
     accessorKey: "id",
     header: "ID",
-    cell: (info) => info.getValue(),
+    cell: (info) => (
+      <Link href={`/suppliers/${info.getValue()}`}>
+        <a class="hover:text-blue-600">{info.getValue() as string}</a>
+      </Link>
+    ),
     footer: (info) => info.column.id,
   },
   {

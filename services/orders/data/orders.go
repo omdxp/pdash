@@ -132,7 +132,11 @@ func GetOrdersByCustomerID(id string, grpcCustomerClient pb.CustomerServiceClien
 		}
 	}
 	var orders Orders
-	cursor, err := collection.Find(ctx, bson.M{"customer_id": id})
+	oid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return orders, http.StatusInternalServerError, err
+	}
+	cursor, err := collection.Find(ctx, bson.M{"customer_id": oid})
 	if err != nil {
 		return orders, http.StatusInternalServerError, err
 	}
@@ -164,7 +168,11 @@ func GetOrdersBySupplierID(id string, grpcSupplierClient pb.SupplierServiceClien
 		}
 	}
 	var orders Orders
-	cursor, err := collection.Find(ctx, bson.M{"supplier_id": id})
+	oid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return orders, http.StatusInternalServerError, err
+	}
+	cursor, err := collection.Find(ctx, bson.M{"supplier_id": oid})
 	if err != nil {
 		return orders, http.StatusInternalServerError, err
 	}
