@@ -159,3 +159,16 @@ export async function addCustomer(customer: Partial<Customer>) {
     return await res.json();
   }
 }
+
+export async function addSupplier(supplier: Partial<Supplier>) {
+  const res = await fetch(SUPPLIERS_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(supplier),
+  });
+  if (res.status == 200) {
+    return await res.json();
+  }
+}

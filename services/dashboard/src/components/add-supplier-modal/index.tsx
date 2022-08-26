@@ -1,17 +1,17 @@
 import { Component, createSignal, onMount } from "solid-js";
 
-import { Customer } from "../../interfaces";
+import { Supplier } from "../../interfaces";
 
-interface AddCustomerModalProps {
-  submit: (draftCustomer: Partial<Customer>) => void;
+interface AddSupplierModalProps {
+  submit: (draftSupplier: Partial<Supplier>) => void;
   cancel: () => void;
 }
 
-const AddCustomerModal: Component<AddCustomerModalProps> = ({
+const AddSupplierModal: Component<AddSupplierModalProps> = ({
   submit,
   cancel,
 }) => {
-  const [draftCustomer, setDraftCustomer] = createSignal<Partial<Customer>>({
+  const [draftSupplier, setDraftSupplier] = createSignal<Partial<Supplier>>({
     name: "",
   });
   return (
@@ -59,10 +59,10 @@ const AddCustomerModal: Component<AddCustomerModalProps> = ({
                   type="text"
                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
                   placeholder="Name"
-                  value={draftCustomer().name}
+                  value={draftSupplier().name}
                   onChange={(e) =>
-                    setDraftCustomer({
-                      ...draftCustomer(),
+                    setDraftSupplier({
+                      ...draftSupplier(),
                       name: (e.target as HTMLInputElement).value,
                     })
                   }
@@ -70,7 +70,7 @@ const AddCustomerModal: Component<AddCustomerModalProps> = ({
               </div>
               <button
                 type="submit"
-                onClick={() => submit(draftCustomer())}
+                onClick={() => submit(draftSupplier())}
                 class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
               >
                 Add
@@ -82,4 +82,4 @@ const AddCustomerModal: Component<AddCustomerModalProps> = ({
     </div>
   );
 };
-export default AddCustomerModal;
+export default AddSupplierModal;

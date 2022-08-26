@@ -6,12 +6,14 @@ import {
 } from "@tanstack/solid-table";
 import { Component, For, createSignal } from "solid-js";
 import {
+  addSupplier,
   deleteSupplier,
   refetchSuppliers,
   suppliers,
   updateSupplier,
 } from "../../store";
 
+import AddSupplierModal from "../../components/add-supplier-modal";
 import { Link } from "@solidjs/router";
 import ModifySupplierModal from "../../components/modify-supplier-modal";
 import { Supplier } from "../../interfaces";
@@ -84,12 +86,29 @@ const Suppliers: Component = ({}) => {
     columns: defaultColumns,
     getCoreRowModel: getCoreRowModel(),
   });
+  const [addSupplierModalShown, setAddSupplierModalShown] = createSignal(false);
   return (
     <div class="flex flex-col">
       {suppliers.loading ? (
         <div>Loading...</div>
       ) : (
         <div>
+          <button
+            class="bg-blue-500 m-2 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            onClick={() => setAddSupplierModalShown(true)}
+          >
+            Add new supplier
+          </button>
+          {addSupplierModalShown() && (
+            <AddSupplierModal
+              submit={async (draftCustomer) => {
+                await addSupplier(draftCustomer);
+                await refetchSuppliers();
+                setAddSupplierModalShown(false);
+              }}
+              cancel={() => setAddSupplierModalShown(false)}
+            />
+          )}
           {selectedSupplier() && (
             <ModifySupplierModal
               supplier={selectedSupplier()}
