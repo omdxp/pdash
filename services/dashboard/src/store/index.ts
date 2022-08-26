@@ -96,3 +96,28 @@ export async function deleteOrder(id: string) {
     return await res.json();
   }
 }
+
+export async function updateCustomer(customer: Customer) {
+  const res = await fetch(CUSTOMERS_URL + "/" + customer.id, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(customer),
+  });
+  if (res.status == 200) {
+    return await res.json();
+  }
+}
+
+export async function deleteCustomer(id: string) {
+  const res = await fetch(CUSTOMERS_URL + "/" + id, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  if (res.status == 200) {
+    return await res.json();
+  }
+}

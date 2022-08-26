@@ -18,17 +18,7 @@ const defaultColumns: ColumnDef<Order>[] = [
   {
     accessorKey: "id",
     header: "ID",
-    cell: (info) => (
-      <button
-        onClick={() =>
-          setSelectedOrder(
-            orders().filter((el) => el.id === (info.getValue() as string))[0]
-          )
-        }
-      >
-        {info.getValue() as string}
-      </button>
-    ),
+    cell: (info) => info.getValue(),
     footer: (info) => info.column.id,
   },
   {
@@ -76,6 +66,23 @@ const defaultColumns: ColumnDef<Order>[] = [
         {new Date(info.getValue() as string).toDateString()} -{" "}
         {new Date(info.getValue() as string).toTimeString()}
       </span>
+    ),
+    footer: (info) => info.column.id,
+  },
+  {
+    accessorKey: "id",
+    header: "Modify",
+    cell: (info) => (
+      <button
+        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        onClick={() =>
+          setSelectedOrder(
+            orders().filter((el) => el.id === (info.getValue() as string))[0]
+          )
+        }
+      >
+        Modify
+      </button>
     ),
     footer: (info) => info.column.id,
   },
