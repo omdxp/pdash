@@ -1,8 +1,7 @@
-import { Component, createEffect, createSignal, onMount } from "solid-js";
+import { Component, createSignal, onMount } from "solid-js";
 
 import DeleteModal from "../delete-modal";
 import { Order } from "../../interfaces";
-import { deleteOrder } from "../../store";
 
 interface ModifyOrderModalProps {
   order: Order;

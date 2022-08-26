@@ -4,11 +4,19 @@ import {
   flexRender,
   getCoreRowModel,
 } from "@tanstack/solid-table";
-import { Component, For } from "solid-js";
+import { Component, For, createSignal } from "solid-js";
+import {
+  deleteSupplier,
+  refetchSuppliers,
+  suppliers,
+  updateSupplier,
+} from "../../store";
 
 import { Link } from "@solidjs/router";
+import ModifySupplierModal from "../../components/modify-supplier-modal";
 import { Supplier } from "../../interfaces";
-import { suppliers } from "../../store";
+
+const [selectedSupplier, setSelectedSupplier] = createSignal<Supplier>(null);
 
 const defaultColumns: ColumnDef<Supplier>[] = [
   {
@@ -49,6 +57,23 @@ const defaultColumns: ColumnDef<Supplier>[] = [
     ),
     footer: (info) => info.column.id,
   },
+  {
+    accessorKey: "id",
+    header: "Modify",
+    cell: (info) => (
+      <button
+        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        onClick={() => {
+          setSelectedSupplier(
+            suppliers().filter((el) => el.id === (info.getValue() as string))[0]
+          );
+        }}
+      >
+        Modify
+      </button>
+    ),
+    footer: (info) => info.column.id,
+  },
 ];
 
 const Suppliers: Component = ({}) => {
@@ -65,6 +90,22 @@ const Suppliers: Component = ({}) => {
         <div>Loading...</div>
       ) : (
         <div>
+          {selectedSupplier() && (
+            <ModifySupplierModal
+              supplier={selectedSupplier()}
+              submit={async (draftCustomer) => {
+                await updateSupplier(draftCustomer);
+                await refetchSuppliers();
+                setSelectedSupplier(null);
+              }}
+              cancel={() => setSelectedSupplier(null)}
+              deleteSupplier={async () => {
+                await deleteSupplier(selectedSupplier().id);
+                await refetchSuppliers();
+                setSelectedSupplier(null);
+              }}
+            />
+          )}
           <table>
             <thead>
               <For each={table.getHeaderGroups()}>

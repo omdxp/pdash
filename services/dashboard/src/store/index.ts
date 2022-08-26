@@ -121,3 +121,28 @@ export async function deleteCustomer(id: string) {
     return await res.json();
   }
 }
+
+export async function updateSupplier(supplier: Supplier) {
+  const res = await fetch(SUPPLIERS_URL + "/" + supplier.id, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(supplier),
+  });
+  if (res.status == 200) {
+    return await res.json();
+  }
+}
+
+export async function deleteSupplier(id: string) {
+  const res = await fetch(SUPPLIERS_URL + "/" + id, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  if (res.status == 200) {
+    return await res.json();
+  }
+}
