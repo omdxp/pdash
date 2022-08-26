@@ -1,4 +1,4 @@
-import { Component, createSignal, onMount } from "solid-js";
+import { Component, createSignal } from "solid-js";
 
 import { Supplier } from "../../interfaces";
 

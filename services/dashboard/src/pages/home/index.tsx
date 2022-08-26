@@ -5,8 +5,15 @@ import {
   getCoreRowModel,
 } from "@tanstack/solid-table";
 import { Component, For, createSignal } from "solid-js";
-import { deleteOrder, orders, refetchOrders, updateOrder } from "../../store";
+import {
+  addOrder,
+  deleteOrder,
+  orders,
+  refetchOrders,
+  updateOrder,
+} from "../../store";
 
+import AddOrderModal from "../../components/add-order-modal";
 import DeleteModal from "../../components/delete-modal";
 import { Link } from "@solidjs/router";
 import ModifyOrderModal from "../../components/modify-order-modal";
@@ -96,12 +103,29 @@ const Home: Component = ({}) => {
     columns: defaultColumns,
     getCoreRowModel: getCoreRowModel(),
   });
+  const [addOrderModalShown, setAddOrderModalShown] = createSignal(false);
   return (
     <div class="flex flex-col">
       {orders.loading ? (
         <div>Loading...</div>
       ) : (
         <div>
+          <button
+            class="bg-blue-500 m-2 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            onClick={() => setAddOrderModalShown(true)}
+          >
+            Add new order
+          </button>
+          {addOrderModalShown() && (
+            <AddOrderModal
+              submit={async (draftOrder) => {
+                await addOrder(draftOrder);
+                await refetchOrders();
+                setAddOrderModalShown(false);
+              }}
+              cancel={() => setAddOrderModalShown(false)}
+            />
+          )}
           {selectedOrder() && (
             <ModifyOrderModal
               order={selectedOrder()}

@@ -101,8 +101,8 @@ const Suppliers: Component = ({}) => {
           </button>
           {addSupplierModalShown() && (
             <AddSupplierModal
-              submit={async (draftCustomer) => {
-                await addSupplier(draftCustomer);
+              submit={async (draftSupplier) => {
+                await addSupplier(draftSupplier);
                 await refetchSuppliers();
                 setAddSupplierModalShown(false);
               }}

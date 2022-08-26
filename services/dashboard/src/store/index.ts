@@ -172,3 +172,16 @@ export async function addSupplier(supplier: Partial<Supplier>) {
     return await res.json();
   }
 }
+
+export async function addOrder(order: Partial<Order>) {
+  const res = await fetch(ORDERS_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(order),
+  });
+  if (res.status == 200) {
+    return await res.json();
+  }
+}
