@@ -1,0 +1,54 @@
+syntax = "proto3";
+option go_package = "github.com/Omar-Belghaouti/pdash/services/customers/pb";
+package pb;
+
+message Empty {}
+
+message Order {
+    string id = 1;
+    string supplier_id = 2;
+    string customer_id = 3;
+    string created_at = 5;
+    string updated_at = 6;
+    float total_price = 7;
+}
+
+message Supplier {
+    string id = 1;
+    string name = 2;
+    string created_at = 3;
+    string updated_at = 4;
+}
+
+message Customer {
+    string id = 1;
+    string name = 2;
+    string created_at = 3;
+    string updated_at = 4;
+}
+
+service OrderService {
+    rpc GetOrder(Order) returns (Order) {}
+    rpc GetAllOrders(Empty) returns (stream Order) {}
+    rpc GetAllOrdersByCustomer(Customer) returns (stream Order) {}
+    rpc GetAllOrdersBySupplier(Supplier) returns (stream Order) {}
+    rpc CreateOrder(Order) returns (Order) {}
+    rpc UpdateOrder(Order) returns (Order) {}
+    rpc DeleteOrder(Order) returns (Order) {}
+}
+
+service SupplierService {
+    rpc GetSupplier(Supplier) returns (Supplier) {}
+    rpc GetAllSuppliers(Empty) returns (stream Supplier) {}
+    rpc CreateSupplier(Supplier) returns (Supplier) {}
+    rpc UpdateSupplier(Supplier) returns (Supplier) {}
+    rpc DeleteSupplier(Supplier) returns (Supplier) {}
+}
+
+service CustomerService {
+    rpc GetCustomer(Customer) returns (Customer) {}
+    rpc GetAllCustomers(Empty) returns (stream Customer) {}
+    rpc CreateCustomer(Customer) returns (Customer) {}
+    rpc UpdateCustomer(Customer) returns (Customer) {}
+    rpc DeleteCustomer(Customer) returns (Customer) {}
+}

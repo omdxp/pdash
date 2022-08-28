@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Omar-Belghaouti/pdash/pb"
+	"github.com/Omar-Belghaouti/pdash/services/orders/pb"
 	"github.com/go-redis/redis/v9"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"

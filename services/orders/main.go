@@ -6,8 +6,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/Omar-Belghaouti/pdash/pb"
 	"github.com/Omar-Belghaouti/pdash/services/orders/data"
+	"github.com/Omar-Belghaouti/pdash/services/orders/pb"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"google.golang.org/grpc"
@@ -135,7 +135,7 @@ func main() {
 			})
 		})
 
-		app.Listen(":3002")
+		app.Listen("localhost:3002")
 	}()
 
 	wg.Wait()

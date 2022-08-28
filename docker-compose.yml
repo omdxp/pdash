@@ -1,0 +1,72 @@
+version: "3.9"
+services:
+  dashboard:
+    container_name: dashboard
+    build:
+      context: ./services/dashboard
+      dockerfile: Dockerfile
+      args:
+        - VITE_CUSTOMERS_URL=http://localhost:3001/customers
+        - VITE_ORDERS_URL=http://localhost:3002/orders
+        - VITE_SUPPLIERS_URL=http://localhost:3003/suppliers
+    ports:
+      - 3000:80
+      - 8001:8001
+      - 8002:8002
+      - 8003:8003
+    depends_on:
+      - orders
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    
+  customers:
+    container_name: customers
+    build:
+      context: ./services/customers
+      dockerfile: Dockerfile
+    ports:
+      - 3001:3001
+    depends_on:
+      - mongo
+      - redis
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    
+  suppliers:
+    container_name: suppliers
+    build:
+      context: ./services/suppliers
+      dockerfile: Dockerfile
+    ports:
+      - 3003:3003
+    depends_on:
+      - mongo
+      - redis
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  orders:
+    container_name: orders
+    build:
+      context: ./services/orders
+      dockerfile: Dockerfile
+    ports:
+      - 3002:3002
+    depends_on:
+      - customers
+      - suppliers
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  mongo:
+    container_name: mongo
+    image: mongo:5.0.11
+    ports:
+      - 27017:27017
+
+  redis:
+    container_name: redis
+    image: redis:alpine3.16
+    ports:
+      - 6379:6379
+  

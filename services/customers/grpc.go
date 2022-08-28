@@ -4,8 +4,8 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/Omar-Belghaouti/pdash/pb"
 	"github.com/Omar-Belghaouti/pdash/services/customers/data"
+	"github.com/Omar-Belghaouti/pdash/services/customers/pb"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

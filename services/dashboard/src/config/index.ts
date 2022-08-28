@@ -1,3 +1,3 @@
-export const CUSTOMERS_URL = "http://localhost:3001/customers";
-export const ORDERS_URL = "http://localhost:3002/orders";
-export const SUPPLIERS_URL = "http://localhost:3003/suppliers";
+export const CUSTOMERS_URL = import.meta.env.VITE_CUSTOMERS_URL;
+export const ORDERS_URL = import.meta.env.VITE_ORDERS_URL;
+export const SUPPLIERS_URL = import.meta.env.VITE_SUPPLIERS_URL;

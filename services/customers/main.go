@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/Omar-Belghaouti/pdash/pb"
 	"github.com/Omar-Belghaouti/pdash/services/customers/data"
+	"github.com/Omar-Belghaouti/pdash/services/customers/pb"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"google.golang.org/grpc"
@@ -105,7 +105,7 @@ func main() {
 			return c.Status(status).JSON(Response{Message: "Customer deleted successfully"})
 		})
 
-		app.Listen(":3001")
+		app.Listen("localhost:3001")
 	}()
 
 	wg.Wait()
