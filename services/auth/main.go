@@ -34,5 +34,18 @@ func main() {
 		return c.Status(status).JSON(user)
 	})
 
+	// Login a user
+	app.Post("/users/login", func(c *fiber.Ctx) error {
+		req := data.LoginUserRequest{}
+		if err := c.BodyParser(&req); err != nil {
+			return c.Status(http.StatusBadRequest).JSON(Respone{Message: err.Error()})
+		}
+		user, status, err := data.LoginUser(req)
+		if err != nil {
+			return c.Status(status).JSON(Respone{Message: err.Error()})
+		}
+		return c.Status(status).JSON(user)
+	})
+
 	app.Listen("0.0.0.0:3004")
 }
