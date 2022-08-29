@@ -6,18 +6,21 @@ services:
       context: ./services/dashboard
       dockerfile: Dockerfile
       args:
-        - VITE_CUSTOMERS_URL=http://localhost:3001/customers
-        - VITE_ORDERS_URL=http://localhost:3002/orders
-        - VITE_SUPPLIERS_URL=http://localhost:3003/suppliers
+        - VITE_CUSTOMERS_URL=http://localhost:8001/customers
+        - VITE_ORDERS_URL=http://localhost:8002/orders
+        - VITE_SUPPLIERS_URL=http://localhost:8003/suppliers
     ports:
       - 3000:80
       - 8001:8001
       - 8002:8002
       - 8003:8003
+    links:
+      - customers
+      - orders
+      - suppliers
+    restart: always
     depends_on:
       - orders
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     
   customers:
     container_name: customers
@@ -29,8 +32,9 @@ services:
     depends_on:
       - mongo
       - redis
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    links:
+      - mongo
+      - redis
     
   suppliers:
     container_name: suppliers
@@ -42,8 +46,9 @@ services:
     depends_on:
       - mongo
       - redis
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    links:
+      - mongo
+      - redis
 
   orders:
     container_name: orders
@@ -55,18 +60,23 @@ services:
     depends_on:
       - customers
       - suppliers
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    links:
+      - mongo
+      - redis
+      - customers
+      - suppliers
 
   mongo:
     container_name: mongo
     image: mongo:5.0.11
     ports:
       - 27017:27017
+    restart: always
 
   redis:
     container_name: redis
     image: redis:alpine3.16
     ports:
       - 6379:6379
+    restart: always
   

@@ -29,7 +29,7 @@ func main() {
 		defer wg.Done()
 		for {
 			log.Print("Dialing Customers gRPC server on port 4001")
-			cc, err := grpc.Dial("localhost:4001", grpc.WithTransportCredentials(insecure.NewCredentials()))
+			cc, err := grpc.Dial("customers:4001", grpc.WithTransportCredentials(insecure.NewCredentials()))
 			if err != nil {
 				log.Fatalf("failed to dial: %s", err.Error())
 			}
@@ -41,8 +41,8 @@ func main() {
 	go func() {
 		defer wg.Done()
 		for {
-			log.Print("Dialing Suppliers gRPC server on port 4001")
-			cc, err := grpc.Dial("localhost:4003", grpc.WithTransportCredentials(insecure.NewCredentials()))
+			log.Print("Dialing Suppliers gRPC server on port 4003")
+			cc, err := grpc.Dial("suppliers:4003", grpc.WithTransportCredentials(insecure.NewCredentials()))
 			if err != nil {
 				log.Fatalf("failed to dial: %s", err.Error())
 			}
@@ -56,7 +56,10 @@ func main() {
 		app := fiber.New()
 
 		// CORS
-		app.Use(cors.New())
+		app.Use(cors.New(cors.Config{
+			AllowOrigins: "*",
+			AllowMethods: "GET, POST, PUT, DELETE",
+		}))
 
 		// Create a new Order
 		app.Post("/orders", func(c *fiber.Ctx) error {
@@ -135,7 +138,7 @@ func main() {
 			})
 		})
 
-		app.Listen("localhost:3002")
+		app.Listen("0.0.0.0:3002")
 	}()
 
 	wg.Wait()

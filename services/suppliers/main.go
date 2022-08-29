@@ -25,7 +25,7 @@ func main() {
 	// Start the grpc server
 	go func() {
 		defer wg.Done()
-		lis, err := net.Listen("tcp", ":4003")
+		lis, err := net.Listen("tcp", "0.0.0.0:4003")
 		if err != nil {
 			log.Fatalf("failed to listen: %s", err.Error())
 		}
@@ -47,7 +47,10 @@ func main() {
 		app := fiber.New()
 
 		// CORS
-		app.Use(cors.New())
+		app.Use(cors.New(cors.Config{
+			AllowOrigins: "*, http://localhost:3000",
+			AllowMethods: "GET, POST, PUT, DELETE",
+		}))
 
 		// Create a new Supplier
 		app.Post("/suppliers", func(c *fiber.Ctx) error {
@@ -105,7 +108,7 @@ func main() {
 			return c.Status(status).JSON(Response{Message: "Supplier deleted successfully"})
 		})
 
-		app.Listen("localhost:3003")
+		app.Listen("0.0.0.0:3003")
 	}()
 
 	wg.Wait()

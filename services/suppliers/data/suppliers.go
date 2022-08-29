@@ -22,13 +22,13 @@ var (
 
 func init() {
 	ctx = context.Background()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:27017"))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://mongo:27017"))
 	if err != nil {
 		log.Fatalf("Error connecting to MongoDB: %s", err.Error())
 	}
 	collection = client.Database("db").Collection("suppliers")
 	rdb = redis.NewClient(&redis.Options{
-		Addr: "localhost:6379",
+		Addr: "redis:6379",
 	})
 }
 

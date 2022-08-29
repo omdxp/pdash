@@ -7,9 +7,11 @@ import {
 import { Component, For, createSignal } from "solid-js";
 import {
   addOrder,
+  customers,
   deleteOrder,
   orders,
   refetchOrders,
+  suppliers,
   updateOrder,
 } from "../../store";
 
@@ -112,7 +114,13 @@ const Home: Component = ({}) => {
         <div>
           <button
             class="bg-blue-500 m-2 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-            onClick={() => setAddOrderModalShown(true)}
+            onClick={() => {
+              if (customers().length > 0 && suppliers().length > 0) {
+                setAddOrderModalShown(true);
+              } else {
+                alert("You need to add customers and suppliers first");
+              }
+            }}
           >
             Add new order
           </button>
