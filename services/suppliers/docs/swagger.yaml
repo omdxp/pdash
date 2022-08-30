@@ -1,0 +1,184 @@
+basePath: /
+definitions:
+  data.Supplier:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  main.Response:
+    properties:
+      message:
+        type: string
+    type: object
+host: localhost:8003
+info:
+  contact:
+    email: omarbelghaouti@gmail.com
+    name: Omar Belghaouti
+  description: pdash suppliers service
+  title: pdash suppliers service
+  version: "1.0"
+paths:
+  /suppliers:
+    get:
+      consumes:
+      - application/json
+      description: Get all Suppliers
+      operationId: get-suppliers
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/data.Supplier'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/main.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/main.Response'
+      summary: Get all Suppliers
+    post:
+      consumes:
+      - application/json
+      description: Create a new Supplier
+      operationId: create-supplier
+      parameters:
+      - description: Supplier
+        in: body
+        name: supplier
+        required: true
+        schema:
+          $ref: '#/definitions/data.Supplier'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/data.Supplier'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/main.Response'
+      summary: Create a new Supplier
+  /suppliers/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a Supplier by ID
+      operationId: delete-supplier-by-id
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/main.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/main.Response'
+      summary: Delete a Supplier by ID
+    get:
+      consumes:
+      - application/json
+      description: Get a Supplier by ID
+      operationId: get-supplier-by-id
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/data.Supplier'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/main.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/main.Response'
+      summary: Get a Supplier by ID
+    put:
+      consumes:
+      - application/json
+      description: Update a Supplier by ID
+      operationId: update-supplier-by-id
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Supplier
+        in: body
+        name: supplier
+        required: true
+        schema:
+          $ref: '#/definitions/data.Supplier'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/main.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/main.Response'
+      summary: Update a Supplier by ID
+swagger: "2.0"
