@@ -1,0 +1,106 @@
+basePath: /
+definitions:
+  data.LoginUserRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  data.LoginUserResponse:
+    properties:
+      access_token:
+        type: string
+      user:
+        $ref: '#/definitions/data.User'
+    type: object
+  data.User:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      fullname:
+        type: string
+      id:
+        type: string
+      password:
+        type: string
+      updated_at:
+        type: string
+      username:
+        type: string
+    type: object
+  main.Respone:
+    properties:
+      message:
+        type: string
+    type: object
+host: localhost:8004
+info:
+  contact:
+    email: omarbelghaouti@gmail.com
+    name: Omar Belghaouti
+  description: pdash auth service
+  title: pdash auth service
+  version: "1.0"
+paths:
+  /users:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user
+      operationId: create-user
+      parameters:
+      - description: User
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/data.User'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/data.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.Respone'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/main.Respone'
+      summary: Create a new user
+  /users/login:
+    post:
+      consumes:
+      - application/json
+      description: Login a user
+      operationId: login-user
+      parameters:
+      - description: User
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/data.LoginUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/data.LoginUserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.Respone'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/main.Respone'
+      summary: Login a user
+swagger: "2.0"
