@@ -1,6 +1,7 @@
-import { Route, Routes } from "@solidjs/router";
+import { Component, createEffect, onMount } from "solid-js";
+import { Route, Routes, useNavigate } from "@solidjs/router";
+import { setToken, token } from "./store";
 
-import type { Component } from "solid-js";
 import Customer from "./pages/customer";
 import Customers from "./pages/customers";
 import Header from "./components/header";

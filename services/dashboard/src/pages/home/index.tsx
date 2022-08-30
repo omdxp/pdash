@@ -4,7 +4,7 @@ import {
   flexRender,
   getCoreRowModel,
 } from "@tanstack/solid-table";
-import { Component, For, createSignal } from "solid-js";
+import { Component, For, createSignal, onMount } from "solid-js";
 import {
   addOrder,
   customers,
@@ -12,11 +12,11 @@ import {
   orders,
   refetchOrders,
   suppliers,
+  token,
   updateOrder,
 } from "../../store";
 
 import AddOrderModal from "../../components/add-order-modal";
-import DeleteModal from "../../components/delete-modal";
 import { Link } from "@solidjs/router";
 import ModifyOrderModal from "../../components/modify-order-modal";
 import { Order } from "../../interfaces";
@@ -106,9 +106,20 @@ const Home: Component = ({}) => {
     getCoreRowModel: getCoreRowModel(),
   });
   const [addOrderModalShown, setAddOrderModalShown] = createSignal(false);
+  onMount(() => {
+    refetchOrders();
+  });
   return (
     <div class="flex flex-col">
-      {orders.loading ? (
+      {!token() ? (
+        <div class="flex justify-center items-center">
+          <Link href="/login">
+            <a class="bg-blue-500 m-2 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+              Login
+            </a>
+          </Link>
+        </div>
+      ) : orders.loading ? (
         <div>Loading...</div>
       ) : (
         <div>

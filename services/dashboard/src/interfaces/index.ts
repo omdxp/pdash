@@ -26,3 +26,13 @@ export interface Customer {
 }
 
 export type Customers = Customer[];
+
+export interface User {
+  id: string;
+  username: string;
+  password: string;
+  fullname: string;
+  email: string;
+  created_at: string;
+  updated_at: string;
+}

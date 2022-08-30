@@ -4,7 +4,7 @@ import {
   flexRender,
   getCoreRowModel,
 } from "@tanstack/solid-table";
-import { Component, For, createSignal } from "solid-js";
+import { Component, For, createSignal, onMount } from "solid-js";
 import {
   addCustomer,
   customers,
@@ -87,6 +87,9 @@ const Customers: Component = ({}) => {
     getCoreRowModel: getCoreRowModel(),
   });
   const [addCustomerModalShown, setAddCustomerModalShown] = createSignal(false);
+  onMount(() => {
+    refetchCustomers();
+  });
   return (
     <div class="flex flex-col">
       {customers.loading ? (
