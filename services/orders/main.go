@@ -8,7 +8,9 @@ import (
 	"sync"
 
 	"github.com/Omar-Belghaouti/pdash/services/orders/data"
+	_ "github.com/Omar-Belghaouti/pdash/services/orders/docs"
 	"github.com/Omar-Belghaouti/pdash/services/orders/pb"
+	swagger "github.com/arsmn/fiber-swagger/v2"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"google.golang.org/grpc"
@@ -21,6 +23,13 @@ type Response struct {
 	Message string `json:"message"`
 }
 
+// @title pdash orders service
+// @version 1.0
+// @description pdash orders service
+// @contact.name Omar Belghaouti
+// @contact.email omarbelghaouti@gmail.com
+// @host localhost:8002
+// @BasePath /
 func main() {
 	var wg sync.WaitGroup
 	grpcCustomerClient := make(chan pb.CustomerServiceClient)
@@ -77,6 +86,9 @@ func main() {
 			AllowOrigins: "*",
 			AllowMethods: "GET, POST, PUT, DELETE",
 		}))
+
+		// Swagger
+		app.Get("/swagger/*", swagger.HandlerDefault)
 
 		// Auth middleware
 		app.Use(func(c *fiber.Ctx) error {
@@ -146,43 +158,114 @@ func main() {
 		})
 
 		// Get a Order by ID
-		app.Get("/orders/:id", func(c *fiber.Ctx) error {
-			id := c.Params("id")
-			order, status, err := data.GetOrder(id)
-			if err != nil {
-				return c.Status(status).JSON(Response{Message: err.Error()})
-			}
-			return c.Status(status).JSON(order)
-		})
+		app.Get("/orders/:id", GetOrderByID)
 
 		// Update a Order by ID
-		app.Put("/orders/:id", func(c *fiber.Ctx) error {
-			id := c.Params("id")
-			order := data.Order{}
-			if err := c.BodyParser(&order); err != nil {
-				return c.Status(http.StatusBadRequest).JSON(Response{Message: err.Error()})
-			}
-			order, status, err := data.UpdateOrder(id, order)
-			if err != nil {
-				return c.Status(status).JSON(Response{Message: err.Error()})
-			}
-			return c.Status(status).JSON(Response{Message: "Order updated successfully"})
-		})
+		app.Put("/orders/:id", UpdateOrderByID)
 
 		// Delete a Order by ID
-		app.Delete("/orders/:id", func(c *fiber.Ctx) error {
-			id := c.Params("id")
-			status, err := data.DeleteOrder(id)
-			if err != nil {
-				return c.Status(status).JSON(Response{Message: err.Error()})
-			}
-			return c.Status(status).JSON(Response{
-				Message: "Order deleted",
-			})
-		})
+		app.Delete("/orders/:id", DeleteOrderByID)
 
 		app.Listen("0.0.0.0:3002")
 	}()
 
 	wg.Wait()
+}
+
+// CreateOrder creates a new Order
+// @Summary Create a new Order
+// @Description Create a new Order
+// @ID create-order
+// @Accept  json
+// @Produce  json
+// @Param order body data.Order true "Order"
+// @Success 201 {object} data.Order
+// @Failure 400 {object} Response
+// @Failure 500 {object} Response
+// @Router /orders [post]
+func CreateOrder() {}
+
+// GetOrders returns all Orders
+// @Summary Get all Orders
+// @Description Get all Orders
+// @ID get-orders
+// @Accept  json
+// @Produce  json
+// @Param supplier_id query string false "Supplier ID"
+// @Param customer_id query string false "Customer ID"
+// @Success 200 {array} data.Order
+// @Failure 404 {object} Response
+// @Failure 400 {object} Response
+// @Failure 500 {object} Response
+// @Router /orders [get]
+func GetOrders() {}
+
+// GetOrderByID returns a Order by ID
+// @Summary Get a Order by ID
+// @Description Get a Order by ID
+// @ID get-order-by-id
+// @Accept  json
+// @Produce  json
+// @Param id path string true "Order ID"
+// @Success 200 {object} data.Order
+// @Failure 404 {object} Response
+// @Failure 400 {object} Response
+// @Failure 500 {object} Response
+// @Router /orders/{id} [get]
+func GetOrderByID(c *fiber.Ctx) error {
+	id := c.Params("id")
+	order, status, err := data.GetOrder(id)
+	if err != nil {
+		return c.Status(status).JSON(Response{Message: err.Error()})
+	}
+	return c.Status(status).JSON(order)
+}
+
+// UpdateOrderByID updates a Order by ID
+// @Summary Update a Order by ID
+// @Description Update a Order by ID
+// @ID update-order-by-id
+// @Accept  json
+// @Produce  json
+// @Param id path string true "Order ID"
+// @Param order body data.Order true "Order"
+// @Success 200 {object} Response
+// @Failure 404 {object} Response
+// @Failure 400 {object} Response
+// @Failure 500 {object} Response
+// @Router /orders/{id} [put]
+func UpdateOrderByID(c *fiber.Ctx) error {
+	id := c.Params("id")
+	order := data.Order{}
+	if err := c.BodyParser(&order); err != nil {
+		return c.Status(http.StatusBadRequest).JSON(Response{Message: err.Error()})
+	}
+	order, status, err := data.UpdateOrder(id, order)
+	if err != nil {
+		return c.Status(status).JSON(Response{Message: err.Error()})
+	}
+	return c.Status(status).JSON(Response{Message: "Order updated successfully"})
+}
+
+// DeleteOrderByID deletes a Order by ID
+// @Summary Delete a Order by ID
+// @Description Delete a Order by ID
+// @ID delete-order-by-id
+// @Accept  json
+// @Produce  json
+// @Param id path string true "Order ID"
+// @Success 200 {object} Response
+// @Failure 404 {object} Response
+// @Failure 400 {object} Response
+// @Failure 500 {object} Response
+// @Router /orders/{id} [delete]
+func DeleteOrderByID(c *fiber.Ctx) error {
+	id := c.Params("id")
+	status, err := data.DeleteOrder(id)
+	if err != nil {
+		return c.Status(status).JSON(Response{Message: err.Error()})
+	}
+	return c.Status(status).JSON(Response{
+		Message: "Order deleted",
+	})
 }
