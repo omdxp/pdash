@@ -9,18 +9,22 @@ services:
         - VITE_CUSTOMERS_URL=http://localhost:8001/customers
         - VITE_ORDERS_URL=http://localhost:8002/orders
         - VITE_SUPPLIERS_URL=http://localhost:8003/suppliers
+        - VITE_AUTH_URL=http://localhost:8004/users
     ports:
       - 3000:80
       - 8001:8001
       - 8002:8002
       - 8003:8003
+      - 8004:8004
     links:
       - customers
       - orders
       - suppliers
+      - auth
     restart: always
     depends_on:
       - orders
+      - auth
     
   customers:
     container_name: customers
@@ -32,9 +36,11 @@ services:
     depends_on:
       - mongo
       - redis
+      - auth
     links:
       - mongo
       - redis
+      - auth
     
   suppliers:
     container_name: suppliers
@@ -46,9 +52,11 @@ services:
     depends_on:
       - mongo
       - redis
+      - auth
     links:
       - mongo
       - redis
+      - auth
 
   orders:
     container_name: orders
@@ -60,11 +68,25 @@ services:
     depends_on:
       - customers
       - suppliers
+      - auth
     links:
       - mongo
       - redis
       - customers
       - suppliers
+      - auth
+
+  auth:
+    container_name: auth
+    build:
+      context: ./services/auth
+      dockerfile: Dockerfile
+    ports:
+      - 3004:3004
+    depends_on:
+      - mongo
+    links:
+      - mongo
 
   mongo:
     container_name: mongo
@@ -72,6 +94,8 @@ services:
     ports:
       - 27017:27017
     restart: always
+    volumes:
+      - ./services/mongo:/data/db
 
   redis:
     container_name: redis

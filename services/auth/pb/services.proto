@@ -1,5 +1,5 @@
 syntax = "proto3";
-option go_package = "github.com/Omar-Belghaouti/pdash/services/customers/pb";
+option go_package = "github.com/Omar-Belghaouti/pdash/services/auth/pb";
 package pb;
 
 message Empty {}

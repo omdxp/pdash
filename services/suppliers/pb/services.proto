@@ -27,6 +27,10 @@ message Customer {
     string updated_at = 4;
 }
 
+message Auth {
+    string access_token = 1;
+}
+
 service OrderService {
     rpc GetOrder(Order) returns (Order) {}
     rpc GetAllOrders(Empty) returns (stream Order) {}
@@ -51,4 +55,8 @@ service CustomerService {
     rpc CreateCustomer(Customer) returns (Customer) {}
     rpc UpdateCustomer(Customer) returns (Customer) {}
     rpc DeleteCustomer(Customer) returns (Customer) {}
+}
+
+service AuthService {
+    rpc VerifyToken(Auth) returns (Auth) {}
 }

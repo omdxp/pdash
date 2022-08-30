@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"strings"
@@ -11,10 +12,12 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/status"
 )
 
-type Respone struct {
+type Response struct {
 	Message string `json:"message"`
 }
 
@@ -22,8 +25,22 @@ func main() {
 	var wg sync.WaitGroup
 	grpcCustomerClient := make(chan pb.CustomerServiceClient)
 	grpcSupplierClient := make(chan pb.SupplierServiceClient)
+	grpcAuthClient := make(chan pb.AuthServiceClient)
 
-	wg.Add(3)
+	wg.Add(4)
+	// Start the grpc client to Auth gRPC server
+	go func() {
+		defer wg.Done()
+		for {
+			log.Print("Dialing Auth gRPC server on port 4004")
+			cc, err := grpc.Dial("auth:4004", grpc.WithTransportCredentials(insecure.NewCredentials()))
+			if err != nil {
+				log.Fatalf("failed to dial: %s", err.Error())
+			}
+			grpcAuthClient <- pb.NewAuthServiceClient(cc)
+		}
+	}()
+
 	// Start the grpc client to Customers gRPC server
 	go func() {
 		defer wg.Done()
@@ -61,15 +78,41 @@ func main() {
 			AllowMethods: "GET, POST, PUT, DELETE",
 		}))
 
+		// Auth middleware
+		app.Use(func(c *fiber.Ctx) error {
+			authClient := <-grpcAuthClient
+			authHeader := c.Get("Authorization")
+			if authHeader == "" {
+				return c.Status(http.StatusUnauthorized).JSON(Response{Message: "Unauthorized"})
+			}
+			fields := strings.Fields(authHeader)
+			if len(fields) != 2 || fields[0] != "Bearer" {
+				return c.Status(http.StatusUnauthorized).JSON(Response{Message: "Unauthorized"})
+			}
+			token := fields[1]
+			_, err := authClient.VerifyToken(context.Background(), &pb.Auth{AccessToken: token})
+			if err != nil {
+				s, ok := status.FromError(err)
+				if ok {
+					if s.Code() == codes.Unauthenticated {
+						return c.Status(http.StatusUnauthorized).JSON(Response{Message: "Unauthorized"})
+					}
+					return c.Status(http.StatusInternalServerError).JSON(Response{Message: "Internal server error: " + err.Error()})
+				}
+				return c.Status(http.StatusInternalServerError).JSON(Response{Message: "Internal server error: " + err.Error()})
+			}
+			return c.Next()
+		})
+
 		// Create a new Order
 		app.Post("/orders", func(c *fiber.Ctx) error {
 			order := data.Order{}
 			if err := c.BodyParser(&order); err != nil {
-				return c.Status(http.StatusBadRequest).JSON(Respone{Message: err.Error()})
+				return c.Status(http.StatusBadRequest).JSON(Response{Message: err.Error()})
 			}
 			order, status, err := data.CreateOrder(order, <-grpcCustomerClient, <-grpcSupplierClient)
 			if err != nil {
-				return c.Status(status).JSON(Respone{Message: err.Error()})
+				return c.Status(status).JSON(Response{Message: err.Error()})
 			}
 			return c.Status(status).JSON(order)
 		})
@@ -79,25 +122,25 @@ func main() {
 			supplierID := c.Query("supplier_id")
 			customerID := c.Query("customer_id")
 			if strings.TrimSpace(supplierID) != "" && strings.TrimSpace(customerID) != "" {
-				return c.Status(http.StatusBadRequest).JSON(Respone{Message: "supplier_id and customer_id are mutually exclusive"})
+				return c.Status(http.StatusBadRequest).JSON(Response{Message: "supplier_id and customer_id are mutually exclusive"})
 			}
 			if strings.TrimSpace(supplierID) != "" {
 				orders, status, err := data.GetOrdersBySupplierID(supplierID, <-grpcSupplierClient)
 				if err != nil {
-					return c.Status(status).JSON(Respone{Message: err.Error()})
+					return c.Status(status).JSON(Response{Message: err.Error()})
 				}
 				return c.Status(status).JSON(orders)
 			}
 			if strings.TrimSpace(customerID) != "" {
 				orders, status, err := data.GetOrdersByCustomerID(customerID, <-grpcCustomerClient)
 				if err != nil {
-					return c.Status(status).JSON(Respone{Message: err.Error()})
+					return c.Status(status).JSON(Response{Message: err.Error()})
 				}
 				return c.Status(status).JSON(orders)
 			}
 			orders, status, err := data.GetOrders()
 			if err != nil {
-				return c.Status(status).JSON(Respone{Message: err.Error()})
+				return c.Status(status).JSON(Response{Message: err.Error()})
 			}
 			return c.Status(status).JSON(orders)
 		})
@@ -107,7 +150,7 @@ func main() {
 			id := c.Params("id")
 			order, status, err := data.GetOrder(id)
 			if err != nil {
-				return c.Status(status).JSON(Respone{Message: err.Error()})
+				return c.Status(status).JSON(Response{Message: err.Error()})
 			}
 			return c.Status(status).JSON(order)
 		})
@@ -117,13 +160,13 @@ func main() {
 			id := c.Params("id")
 			order := data.Order{}
 			if err := c.BodyParser(&order); err != nil {
-				return c.Status(http.StatusBadRequest).JSON(Respone{Message: err.Error()})
+				return c.Status(http.StatusBadRequest).JSON(Response{Message: err.Error()})
 			}
 			order, status, err := data.UpdateOrder(id, order)
 			if err != nil {
-				return c.Status(status).JSON(Respone{Message: err.Error()})
+				return c.Status(status).JSON(Response{Message: err.Error()})
 			}
-			return c.Status(status).JSON(Respone{Message: "Order updated successfully"})
+			return c.Status(status).JSON(Response{Message: "Order updated successfully"})
 		})
 
 		// Delete a Order by ID
@@ -131,9 +174,9 @@ func main() {
 			id := c.Params("id")
 			status, err := data.DeleteOrder(id)
 			if err != nil {
-				return c.Status(status).JSON(Respone{Message: err.Error()})
+				return c.Status(status).JSON(Response{Message: err.Error()})
 			}
-			return c.Status(status).JSON(Respone{
+			return c.Status(status).JSON(Response{
 				Message: "Order deleted",
 			})
 		})

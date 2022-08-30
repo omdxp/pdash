@@ -11,7 +11,7 @@ import (
 )
 
 type server struct {
-	pb.CustomerServiceServer
+	pb.UnimplementedCustomerServiceServer
 }
 
 // GetCustomer implementation for Customer gRPC server

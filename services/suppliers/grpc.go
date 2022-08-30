@@ -11,7 +11,7 @@ import (
 )
 
 type server struct {
-	pb.SupplierServiceServer
+	pb.UnimplementedSupplierServiceServer
 }
 
 // GetSupplier implementation for Supplier gRPC server

@@ -19,7 +19,7 @@ var (
 	ctx        context.Context
 	collection *mongo.Collection
 	config     util.Config
-	tokenMaker *token.PasetoMaker
+	TokenMaker *token.PasetoMaker
 )
 
 func init() {
@@ -28,12 +28,12 @@ func init() {
 	if err != nil {
 		log.Fatalf("cannot load config: %s", err.Error())
 	}
-	tokenMaker, err = token.NewPasetoMaker(config.TokenSymmetricKey)
+	TokenMaker, err = token.NewPasetoMaker(config.TokenSymmetricKey)
 	if err != nil {
 		log.Fatalf("cannot create token maker: %s", err.Error())
 	}
 	ctx = context.Background()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:27017"))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://mongo:27017"))
 	if err != nil {
 		log.Fatalf("Error connecting to MongoDB: %s", err.Error())
 	}
@@ -94,7 +94,7 @@ func LoginUser(req LoginUserRequest) (LoginUserResponse, int, error) {
 	if err := util.CheckPassword(req.Password, user.Password); err != nil {
 		return LoginUserResponse{}, http.StatusUnauthorized, err
 	}
-	accessToken, err := tokenMaker.CreateToken(user.Username, config.AccessTokenDuration)
+	accessToken, err := TokenMaker.CreateToken(user.Username, config.AccessTokenDuration)
 	if err != nil {
 		return LoginUserResponse{}, http.StatusInternalServerError, err
 	}
