@@ -180,6 +180,7 @@ func main() {
 // @Produce  json
 // @Param order body data.Order true "Order"
 // @Success 201 {object} data.Order
+// @Failure 401 {object} Response
 // @Failure 400 {object} Response
 // @Failure 500 {object} Response
 // @Router /orders [post]
@@ -194,6 +195,7 @@ func CreateOrder() {}
 // @Param supplier_id query string false "Supplier ID"
 // @Param customer_id query string false "Customer ID"
 // @Success 200 {array} data.Order
+// @Failure 401 {object} Response
 // @Failure 404 {object} Response
 // @Failure 400 {object} Response
 // @Failure 500 {object} Response
@@ -208,6 +210,7 @@ func GetOrders() {}
 // @Produce  json
 // @Param id path string true "Order ID"
 // @Success 200 {object} data.Order
+// @Failure 401 {object} Response
 // @Failure 404 {object} Response
 // @Failure 400 {object} Response
 // @Failure 500 {object} Response
@@ -230,6 +233,7 @@ func GetOrderByID(c *fiber.Ctx) error {
 // @Param id path string true "Order ID"
 // @Param order body data.Order true "Order"
 // @Success 200 {object} Response
+// @Failure 401 {object} Response
 // @Failure 404 {object} Response
 // @Failure 400 {object} Response
 // @Failure 500 {object} Response
@@ -255,6 +259,7 @@ func UpdateOrderByID(c *fiber.Ctx) error {
 // @Produce  json
 // @Param id path string true "Order ID"
 // @Success 200 {object} Response
+// @Failure 401 {object} Response
 // @Failure 404 {object} Response
 // @Failure 400 {object} Response
 // @Failure 500 {object} Response

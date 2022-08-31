@@ -44,6 +44,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/main.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/main.Response'
         "404":
           description: Not Found
           schema:
@@ -76,6 +80,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/main.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/main.Response'
         "500":
           description: Internal Server Error
           schema:
@@ -102,6 +110,10 @@ paths:
             $ref: '#/definitions/main.Response'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/main.Response'
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/main.Response'
         "404":
@@ -133,6 +145,10 @@ paths:
             $ref: '#/definitions/data.Customer'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/main.Response'
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/main.Response'
         "404":
@@ -170,6 +186,10 @@ paths:
             $ref: '#/definitions/data.Customer'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/main.Response'
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/main.Response'
         "404":

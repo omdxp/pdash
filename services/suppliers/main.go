@@ -138,6 +138,7 @@ func main() {
 // @Produce  json
 // @Param supplier body data.Supplier true "Supplier"
 // @Success 201 {object} data.Supplier
+// @Failure 401 {object} Response
 // @Failure 400 {object} Response
 // @Failure 500 {object} Response
 // @Router /suppliers [post]
@@ -160,6 +161,7 @@ func CreateSupplier(c *fiber.Ctx) error {
 // @Accept  json
 // @Produce  json
 // @Success 200 {array} data.Supplier
+// @Failure 401 {object} Response
 // @Failure 404 {object} Response
 // @Failure 400 {object} Response
 // @Failure 500 {object} Response
@@ -180,6 +182,7 @@ func GetSuppliers(c *fiber.Ctx) error {
 // @Produce  json
 // @Param id path string true "ID"
 // @Success 200 {object} data.Supplier
+// @Failure 401 {object} Response
 // @Failure 404 {object} Response
 // @Failure 400 {object} Response
 // @Failure 500 {object} Response
@@ -202,6 +205,7 @@ func GetSupplierByID(c *fiber.Ctx) error {
 // @Param id path string true "ID"
 // @Param supplier body data.Supplier true "Supplier"
 // @Success 200 {object} Response
+// @Failure 401 {object} Response
 // @Failure 404 {object} Response
 // @Failure 400 {object} Response
 // @Failure 500 {object} Response
@@ -227,6 +231,7 @@ func UpdateSupplierByID(c *fiber.Ctx) error {
 // @Produce  json
 // @Param id path string true "ID"
 // @Success 200 {object} Response
+// @Failure 401 {object} Response
 // @Failure 404 {object} Response
 // @Failure 400 {object} Response
 // @Failure 500 {object} Response

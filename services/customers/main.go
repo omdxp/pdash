@@ -138,6 +138,7 @@ func main() {
 // @Produce  json
 // @Param customer body data.Customer true "Customer"
 // @Success 201 {object} Response
+// @Failure 401 {object} Response
 // @Failure 400 {object} Response
 // @Failure 500 {object} Response
 // @Router /customers [post]
@@ -160,6 +161,7 @@ func CreateCustomer(c *fiber.Ctx) error {
 // @Accept  json
 // @Produce  json
 // @Success 200 {array} data.Customer
+// @Failure 401 {object} Response
 // @Failure 404 {object} Response
 // @Failure 400 {object} Response
 // @Failure 500 {object} Response
@@ -180,6 +182,7 @@ func GetCustomers(c *fiber.Ctx) error {
 // @Produce  json
 // @Param id path string true "ID"
 // @Success 200 {object} data.Customer
+// @Failure 401 {object} Response
 // @Failure 404 {object} Response
 // @Failure 400 {object} Response
 // @Failure 500 {object} Response
@@ -202,6 +205,7 @@ func GetCustomerByID(c *fiber.Ctx) error {
 // @Param id path string true "ID"
 // @Param customer body data.Customer true "Customer"
 // @Success 200 {object} data.Customer
+// @Failure 401 {object} Response
 // @Failure 404 {object} Response
 // @Failure 400 {object} Response
 // @Failure 500 {object} Response
@@ -227,6 +231,7 @@ func UpdateCustomerByID(c *fiber.Ctx) error {
 // @Produce  json
 // @Param id path string true "ID"
 // @Success 200 {object} Response
+// @Failure 401 {object} Response
 // @Failure 404 {object} Response
 // @Failure 400 {object} Response
 // @Failure 500 {object} Response
