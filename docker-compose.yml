@@ -10,6 +10,7 @@ services:
         - VITE_ORDERS_URL=http://localhost:8002/orders
         - VITE_SUPPLIERS_URL=http://localhost:8003/suppliers
         - VITE_AUTH_URL=http://localhost:8004/users
+        - VITE_ORDERS_WS_URL=ws://localhost:8002/ws
     ports:
       - 3000:80
       - 8001:8001

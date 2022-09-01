@@ -263,3 +263,16 @@ func DeleteOrder(id string) (int, error) {
 	}
 	return http.StatusOK, nil
 }
+
+// GetOrdersLength returns the number of Orders
+func GetOrdersLength() int {
+	cursor, err := collection.Find(ctx, bson.M{})
+	if err != nil {
+		return 0
+	}
+	orders := Orders{}
+	if err := cursor.All(ctx, &orders); err != nil {
+		return 0
+	}
+	return len(orders)
+}

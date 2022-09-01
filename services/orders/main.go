@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"log"
 	"net/http"
 	"strings"
@@ -10,9 +11,11 @@ import (
 	"github.com/Omar-Belghaouti/pdash/services/orders/data"
 	_ "github.com/Omar-Belghaouti/pdash/services/orders/docs"
 	"github.com/Omar-Belghaouti/pdash/services/orders/pb"
+	"github.com/antoniodipinto/ikisocket"
 	swagger "github.com/arsmn/fiber-swagger/v2"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/websocket/v2"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials/insecure"
@@ -21,6 +24,15 @@ import (
 
 type Response struct {
 	Message string `json:"message"`
+}
+
+type OrdersData struct {
+	Length int `json:"length"`
+}
+
+type EventMessage struct {
+	Event string     `json:"event"`
+	Data  OrdersData `json:"data"`
 }
 
 // @title pdash orders service
@@ -90,6 +102,18 @@ func main() {
 		// Swagger
 		app.Get("/swagger/*", swagger.HandlerDefault)
 
+		// Setup websocket
+		app.Use("/ws", func(c *fiber.Ctx) error {
+			if websocket.IsWebSocketUpgrade(c) {
+				c.Locals("allowed", true)
+				return c.Next()
+			}
+			return fiber.ErrUpgradeRequired
+		})
+
+		// Websocket
+		app.Get("/ws", ikisocket.New(func(kws *ikisocket.Websocket) {}))
+
 		// Auth middleware
 		app.Use(func(c *fiber.Ctx) error {
 			authClient := <-grpcAuthClient
@@ -126,6 +150,13 @@ func main() {
 			if err != nil {
 				return c.Status(status).JSON(Response{Message: err.Error()})
 			}
+			b, _ := json.Marshal(EventMessage{
+				Event: "orders",
+				Data: OrdersData{
+					Length: data.GetOrdersLength(),
+				},
+			})
+			ikisocket.Broadcast(b)
 			return c.Status(status).JSON(order)
 		})
 
@@ -270,6 +301,13 @@ func DeleteOrderByID(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(status).JSON(Response{Message: err.Error()})
 	}
+	b, _ := json.Marshal(EventMessage{
+		Event: "orders",
+		Data: OrdersData{
+			Length: data.GetOrdersLength(),
+		},
+	})
+	ikisocket.Broadcast(b)
 	return c.Status(status).JSON(Response{
 		Message: "Order deleted",
 	})

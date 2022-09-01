@@ -36,3 +36,12 @@ export interface User {
   created_at: string;
   updated_at: string;
 }
+
+export interface OrdersEventData {
+  length: number;
+}
+
+export interface EventMessage<T> {
+  event: string;
+  data: T;
+}

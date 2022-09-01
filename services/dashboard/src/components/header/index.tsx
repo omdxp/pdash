@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@solidjs/router";
-import { setToken, token } from "../../store";
+import { orders, ordersLength, setToken, token } from "../../store";
 
 import { Component } from "solid-js";
 
@@ -13,7 +13,11 @@ const Header: Component = () => {
             <>
               <Link href="/">
                 <a class="text-gray-300 font-semibold text-lg hover:text-gray-600">
-                  Home
+                  Home{" "}
+                  {ordersLength() &&
+                    orders() &&
+                    Math.abs(ordersLength() - orders().length) !== 0 &&
+                    `(${Math.abs(ordersLength() - orders().length)} new)`}
                 </a>
               </Link>
               <Link href="/suppliers">

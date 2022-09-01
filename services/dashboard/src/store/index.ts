@@ -1,9 +1,17 @@
-import { AUTH_URL, CUSTOMERS_URL, ORDERS_URL, SUPPLIERS_URL } from "../config";
+import {
+  AUTH_URL,
+  CUSTOMERS_URL,
+  ORDERS_URL,
+  ORDERS_WS_URL,
+  SUPPLIERS_URL,
+} from "../config";
 import {
   Customer,
   Customers,
+  EventMessage,
   Order,
   Orders,
+  OrdersEventData,
   Supplier,
   Suppliers,
   User,
@@ -11,6 +19,13 @@ import {
 import { Signal, createResource, createSignal } from "solid-js";
 
 export const [token, setToken] = createStoredSignal("token", null);
+let ws = new WebSocket(ORDERS_WS_URL);
+ws.onmessage = (e) => {
+  const res: EventMessage<OrdersEventData> = JSON.parse(e.data);
+  if (res.event == "orders") {
+    setOrdersLength(res.data.length);
+  }
+};
 
 async function fetchCustomers(): Promise<Customers> {
   if (token()) {
@@ -74,6 +89,7 @@ export const [customers, { refetch: refetchCustomers }] =
 export const [orders, { refetch: refetchOrders }] = createResource(fetchOrders);
 export const [suppliers, { refetch: refetchSuppliers }] =
   createResource(fetchSuppliers);
+export const [ordersLength, setOrdersLength] = createSignal(null);
 
 export async function fetchSupplier(id: string): Promise<Supplier> {
   if (token()) {
