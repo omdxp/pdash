@@ -28,6 +28,6 @@ COPY . ./
 RUN pnpm run build
 
 # host in nginx
-FROM nginx:1.23.2-alpine
+FROM nginx:1.23.3-alpine
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY --from=build /app/dist /dashboard/build
