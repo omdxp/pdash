@@ -17,7 +17,7 @@
     "vite-plugin-solid": "^2.3.0"
   },
   "dependencies": {
-    "@solidjs/router": "^0.5.1",
+    "@solidjs/router": "^0.6.0",
     "@tanstack/solid-table": "^8.5.11",
     "solid-js": "^1.4.7"
   }
